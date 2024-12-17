@@ -1,0 +1,69 @@
+<Window
+    x:Class="Hello_World.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Hello_World"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Hello World">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="TextBlockM" Grid.Column="0" Text="M" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="TextBlockA" Grid.Column="1" Text="A" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="TextBlockS" Grid.Column="2" Text="S" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="TextBlockH" Grid.Column="3" Text="H" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+
+            <TextBlock x:Name="TextBlockMansion" Grid.Column="0" Text="Mansion" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock x:Name="TextBlockApartment" Grid.Column="1" Text="Apartment" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock x:Name="TextBlockShack" Grid.Column="2" Text="Shack" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock x:Name="TextBlockHouse" Grid.Column="3" Text="House" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        </Grid>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel x:Name="SpouseStackPanel" Grid.Column="0" Margin="20">
+                <TextBlock Text="Spouse" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBox x:Name="Spouse1" Margin="5" Width="100" Text="{Binding Spouse1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Spouse2" Margin="5" Width="100" Text="{Binding Spouse2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Spouse3" Margin="5" Width="100" IsReadOnly="True"/>
+            </StackPanel>
+
+            <StackPanel x:Name="KidsStackPanel" Grid.Column="1" Margin="20">
+                <TextBlock Text="# of Kids" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBox x:Name="Kids1" Margin="5" Width="100" Text="{Binding Kids1, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="NumberValidationTextBox"/>
+                <TextBox x:Name="Kids2" Margin="5" Width="100" Text="{Binding Kids2, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="NumberValidationTextBox"/>
+                <TextBox x:Name="Kids3" Margin="5" Width="100" IsReadOnly="True"/>
+            </StackPanel>
+
+            <StackPanel x:Name="CarStackPanel" Grid.Column="2" Margin="20">
+                <TextBlock Text="Car" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBox x:Name="Car1" Margin="5" Width="100" Text="{Binding Car1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Car2" Margin="5" Width="100" Text="{Binding Car2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Car3" Margin="5" Width="100" IsReadOnly="True"/>
+            </StackPanel>
+        </Grid>
+
+        <Button x:Name="RollMagicNumberButton" Grid.Row="2" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding CanRollMagicNumber}" Command="{Binding RollMagicNumberCommand}" Click="RollMagicNumberButton_Click"/>
+    </Grid>
+</Window>
