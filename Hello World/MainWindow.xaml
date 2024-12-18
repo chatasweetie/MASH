@@ -51,8 +51,8 @@
 
             <StackPanel x:Name="KidsStackPanel" Grid.Column="1" Margin="20">
                 <TextBlock Text="# of Kids" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <TextBox x:Name="Kids1" Margin="5" Width="100" Text="{Binding Kids1, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="NumberValidationTextBox"/>
-                <TextBox x:Name="Kids2" Margin="5" Width="100" Text="{Binding Kids2, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="NumberValidationTextBox"/>
+                <TextBox x:Name="Kids1" Margin="5" Width="100" Text="{Binding Kids1, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
+                <TextBox x:Name="Kids2" Margin="5" Width="100" Text="{Binding Kids2, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
                 <TextBox x:Name="Kids3" Margin="5" Width="100" IsReadOnly="True"/>
             </StackPanel>
 
