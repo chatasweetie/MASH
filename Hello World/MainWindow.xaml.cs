@@ -45,30 +45,13 @@ namespace Hello_World
             Debug.WriteLine("********************************");
             Debug.WriteLine("Model is ready");
             Debug.WriteLine("********************************");
-            if (_model != null && _model.IsReady)
-            {
-                string prompt = "We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less and no other information. You must follow the rule. I'll give you two vehicle names or types of vehicle and I want you to tell me a, only one, vehicle name or type that would be funny or odd for the first two. Let's begin now.  Mini cooper and AUDI";
-                string response = await _model.ProcessPromptAsync(prompt);
-                Debug.WriteLine("Did it!");
-                DisplayResponse(response);
-                Debug.WriteLine("********************************");
-            }
         }
-
-        private void DisplayResponse(string response)
-        {
-            Debug.WriteLine("********************************");
-            Debug.WriteLine(response);
-            Debug.WriteLine(response.GetType());
-
-        }
-
 
         private async void RollMagicNumberButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                int magicNumber = GenerateMagicNumber();
+                int magicNumber = GenerateMagicNumber(2,5);
 
                 var userInput = GetUserInput();
 
@@ -76,15 +59,15 @@ namespace Hello_World
                 {
                     Debug.WriteLine($"Spouse1: {userInput.Spouse1}, Spouse2: {userInput.Spouse2}, Kids1: {userInput.Kids1}, Kids2: {userInput.Kids2}, Car1: {userInput.Car1}, Car2: {userInput.Car2}");
 
-                    var aiSuggestions = GetAISuggestions(userInput);
+                    var aiSuggestions = await GetAISuggestions(userInput);
 
                     var gameArray = new List<List<string>>
-                                                                {
-                                                                    new List<string> { "Mansion", "Apartment", "Shack", "House" },
-                                                                    new List<string> { userInput.Spouse1, userInput.Spouse2, aiSuggestions.Spouse3 },
-                                                                    new List<string> { userInput.Kids1, userInput.Kids2, aiSuggestions.Kids3 },
-                                                                    new List<string> { userInput.Car1, userInput.Car2, aiSuggestions.Car3 }
-                                                                };
+                                                                    {
+                                                                        new List<string> { "Mansion", "Apartment", "Shack", "House" },
+                                                                        new List<string> { userInput.Spouse1, userInput.Spouse2, aiSuggestions.Spouse3 },
+                                                                        new List<string> { userInput.Kids1, userInput.Kids2, aiSuggestions.Kids3 },
+                                                                        new List<string> { userInput.Car1, userInput.Car2, aiSuggestions.Car3 }
+                                                                    };
 
                     var result = ProcessGameArray(gameArray, magicNumber) as List<string>;
 
@@ -109,10 +92,10 @@ namespace Hello_World
             }
         }
 
-        private int GenerateMagicNumber()
+        private int GenerateMagicNumber(int low, int high)
         {
             Random random = new Random();
-            return random.Next(2, 5);
+            return random.Next(low, high);
         }
 
         private UserInput GetUserInput()
@@ -130,23 +113,34 @@ namespace Hello_World
         }
 
         /////////////////////////////////////////////////////////////////
-        private AISuggestions GetAISuggestions(UserInput userInput)
+        private async Task<AISuggestions> GetAISuggestions(UserInput userInput)
         {
             Debug.WriteLine("Entering GetAISuggestions method");
 
-
-            string inputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less.  I'll give you two vehicle names or types of vehicle and I want you to tell me a, only one, vehicle name or type that would be funny or odd for the first two. Let's begin now.  Mini cooper and AUDI";
-            Debug.WriteLine($"Input text: {inputText}");
+            Debug.WriteLine(userInput);
+            string spouse_inputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less.  I'll give you two people names and I want you to tell me a, only one, name and nothing else. You want you to only use very popular celebrity names. Let's begin now:  {userInput.Spouse1} and {userInput.Spouse2}";
+            string car_inputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less.  I'll give you two vehicle names or types of vehicle and I want you to tell me a, only one, vehicle name or type and nothing else. Ideally something that would be funny or odd for the first two. Let's begin now:  {userInput.Car1} and {userInput.Car2}";
+            string spouse = string.Empty;
+            string car = string.Empty;
+            if (_model != null && _model.IsReady)
+            {
+                string spouse_response = await _model.ProcessPromptAsync(spouse_inputText);
+                spouse_response = cleanAIresponseGetLastLineWithoutQuotes(spouse_response);
+                spouse = spouse_response;
+                string car_response = await _model.ProcessPromptAsync(car_inputText);
+                car_response = cleanAIresponseGetLastLineWithoutQuotes(car_response);
+                car = car_response;
+            }
+            var kids3 = GenerateMagicNumber(0, 5).ToString();
 
 
             return new AISuggestions
             {
-                Spouse3 = "Leonardo DiCaprio",
-                Kids3 = "3",
-                Car3 = "Limo"
+                Spouse3 = spouse,
+                Kids3 = kids3,
+                Car3 = car
             };
         }
-
 
         /////////////////////////////////////////////////////////////////
         private object ProcessGameArray(List<List<string>> gameArray, int magicNumber)
@@ -171,7 +165,29 @@ namespace Hello_World
 
             return flattenedList;
         }
+
+       
+        public string cleanAIresponseGetLastLineWithoutQuotes(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
+
+            var lines = input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            var lastLine = lines.LastOrDefault()?.Trim() ?? string.Empty;
+
+            // Remove leading and trailing quotation marks
+            if (lastLine.StartsWith("\"") && lastLine.EndsWith("\""))
+            {
+                lastLine = lastLine.Substring(1, lastLine.Length - 2);
+            }
+
+            return lastLine;
+        }
     }
+
 
     public class UserInput
     {
