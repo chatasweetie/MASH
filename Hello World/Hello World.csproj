@@ -21,6 +21,7 @@
     <None Remove="Assets\S.png" />
     <None Remove="Assets\UpperLeftCorner.png" />
     <None Remove="Assets\UpperRightCorner.png" />
+    <None Remove="MainPage.xaml" />
     <None Remove="Resources\Styles.xaml" />
   </ItemGroup>
 
@@ -79,6 +80,11 @@
     <Content Update="Assets\UpperRightCorner.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Resources\Styles.xaml">
