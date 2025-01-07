@@ -10,7 +10,6 @@ namespace Hello_World.AIModel
     internal class GenAIModel : IDisposable
     {
         private const int DefaultMaxLength = 1024;
-
         private Model? _model;
         private Tokenizer? _tokenizer;
         private static readonly SemaphoreSlim _createSemaphore = new(1, 1);
@@ -18,7 +17,7 @@ namespace Hello_World.AIModel
 
         private GenAIModel(string modelDir)
         {
-            // Removed ChatClientMetadata dependency
+            // Constructor logic if needed
         }
 
         public static async Task<GenAIModel?> CreateAsync(string modelDir, CancellationToken cancellationToken = default)
@@ -26,12 +25,10 @@ namespace Hello_World.AIModel
             Debug.WriteLine("********************************");
             Debug.WriteLine("In CreateAsync");
             Debug.WriteLine("********************************");
-            var model = new GenAIModel(modelDir);
-            Debug.WriteLine("********************************");
-            Debug.WriteLine("in creatasync new modle");
-            Debug.WriteLine("********************************");
 
+            var model = new GenAIModel(modelDir);
             var lockAcquired = false;
+
             try
             {
                 await _createSemaphore.WaitAsync(cancellationToken);
@@ -41,6 +38,7 @@ namespace Hello_World.AIModel
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"Exception in CreateAsync: {ex.Message}");
                 model?.Dispose();
                 return null;
             }

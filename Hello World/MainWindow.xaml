@@ -9,6 +9,10 @@
     Title="Hello World">
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/BG.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -16,54 +20,91 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" HorizontalAlignment="Center">
+        <!-- Corner Images -->
+        <Image Source="Assets/UpperLeftCorner.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="220" />
+        <Image Source="Assets/UpperRightCorner.png" HorizontalAlignment="Right" VerticalAlignment="Top" Width="220"/>
+
+        <!-- MASH Images and TextBlocks -->
+        <Grid Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,30">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="TextBlockM" Grid.Column="0" Text="M" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
-            <TextBlock x:Name="TextBlockA" Grid.Column="1" Text="A" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
-            <TextBlock x:Name="TextBlockS" Grid.Column="2" Text="S" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
-            <TextBlock x:Name="TextBlockH" Grid.Column="3" Text="H" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+            <Image x:Name="ImageM" Grid.Column="0" Source="Assets/M.png" Width="120" Height="100" Margin="15" HorizontalAlignment="Center"/>
+            <Image x:Name="ImageA" Grid.Column="1" Source="Assets/A.png" Width="120" Height="100" Margin="15" HorizontalAlignment="Center"/>
+            <Image x:Name="ImageS" Grid.Column="2" Source="Assets/S.png" Width="120" Height="100" Margin="15" HorizontalAlignment="Center"/>
+            <Image x:Name="ImageH" Grid.Column="3" Source="Assets/H.png" Width="120" Height="100" Margin="15" HorizontalAlignment="Center"/>
 
-            <TextBlock x:Name="TextBlockMansion" Grid.Column="0" Text="Mansion" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <TextBlock x:Name="TextBlockApartment" Grid.Column="1" Text="Apartment" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <TextBlock x:Name="TextBlockShack" Grid.Column="2" Text="Shack" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <TextBlock x:Name="TextBlockHouse" Grid.Column="3" Text="House" FontSize="16" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <TextBlock x:Name="TextBlockMansion" Grid.Column="0" Text="Mansion" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="TextBlockApartment" Grid.Column="1" Text="Apartment" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="TextBlockShack" Grid.Column="2" Text="Shack" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"/>
+            <TextBlock x:Name="TextBlockHouse" Grid.Column="3" Text="House" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10,0,0,0"/>
         </Grid>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Center">
+        <!-- Instructions -->
+        <TextBlock Grid.Row="1" Text="INSTRUCTIONS" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+        <TextBlock Grid.Row="1" Text="1. Enter two options for each category" HorizontalAlignment="Center" Margin="0,30,0,0"/>
+        <TextBlock Grid.Row="1" Text="2. Click the magic button to predict your future" HorizontalAlignment="Center" Margin="0,60,0,0"/>
+
+        <!-- Panels -->
+        <Grid Grid.Row="2" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel x:Name="SpouseStackPanel" Grid.Column="0" Margin="20">
-                <TextBlock Text="Spouse" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <TextBox x:Name="Spouse1" Margin="5" Width="100" Text="{Binding Spouse1, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox x:Name="Spouse2" Margin="5" Width="100" Text="{Binding Spouse2, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox x:Name="Spouse3" Margin="5" Width="100" IsReadOnly="True"/>
+            <StackPanel x:Name="SpouseStackPanel" Grid.Row="0" Grid.Column="0" Margin="20">
+                <Border Background="#87ADFF" Padding="5">
+                    <TextBlock Text="Spouse" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </Border>
+                <TextBox x:Name="Spouse1" Text="{Binding Spouse1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Spouse2" Text="{Binding Spouse2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Spouse3" IsReadOnly="True"/>
             </StackPanel>
 
-            <StackPanel x:Name="KidsStackPanel" Grid.Column="1" Margin="20">
-                <TextBlock Text="# of Kids" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <TextBox x:Name="Kids1" Margin="5" Width="100" Text="{Binding Kids1, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
-                <TextBox x:Name="Kids2" Margin="5" Width="100" Text="{Binding Kids2, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
-                <TextBox x:Name="Kids3" Margin="5" Width="100" IsReadOnly="True"/>
+            <StackPanel x:Name="KidsStackPanel" Grid.Row="0" Grid.Column="1" Margin="20">
+                <Border Background="#FFDF78" Padding="5">
+                    <TextBlock Text="# of Kids" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </Border>
+                <TextBox x:Name="Kids1" Text="{Binding Kids1, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
+                <TextBox x:Name="Kids2" Text="{Binding Kids2, UpdateSourceTrigger=PropertyChanged}" BeforeTextChanging="ValidateNumberInput"/>
+                <TextBox x:Name="Kids3" IsReadOnly="True"/>
             </StackPanel>
 
-            <StackPanel x:Name="CarStackPanel" Grid.Column="2" Margin="20">
-                <TextBlock Text="Car" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <TextBox x:Name="Car1" Margin="5" Width="100" Text="{Binding Car1, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox x:Name="Car2" Margin="5" Width="100" Text="{Binding Car2, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox x:Name="Car3" Margin="5" Width="100" IsReadOnly="True"/>
+            <StackPanel x:Name="CarStackPanel" Grid.Row="1" Grid.Column="0" Margin="20">
+                <Border Background="#F980E5" Padding="5">
+                    <TextBlock Text="Car" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </Border>
+                <TextBox x:Name="Car1" Text="{Binding Car1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Car2" Text="{Binding Car2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Car3" IsReadOnly="True"/>
+            </StackPanel>
+
+            <StackPanel x:Name="CareerStackPanel" Grid.Row="1" Grid.Column="1" Margin="20">
+                <Border Background="#47C569" Padding="5">
+                    <TextBlock Text="Career" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </Border>
+                <TextBox x:Name="Career1" Text="{Binding Career1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Career2" Text="{Binding Career2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox x:Name="Career3" IsReadOnly="True"/>
             </StackPanel>
         </Grid>
 
-        <Button x:Name="RollMagicNumberButton" Grid.Row="2" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding CanRollMagicNumber}" Command="{Binding RollMagicNumberCommand}" Click="RollMagicNumberButton_Click"/>
+        <Grid Grid.Row="3" HorizontalAlignment="Center">
+            <Button x:Name="RollMagicNumberButton" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding CanRollMagicNumber}" Command="{Binding RollMagicNumberCommand}" Click="RollMagicNumberButton_Click"/>
+        </Grid>
+        
+        <Grid Grid.Row="4" >
+            <Image Source="Assets/LowerLeftCorner.png" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="220"/>
+            <Image Source="Assets/LowerRightCorner.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="20"/>
+        </Grid>
     </Grid>
 </Window>
