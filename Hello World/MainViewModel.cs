@@ -6,6 +6,7 @@ namespace Hello_World
     public class MainViewModel : INotifyPropertyChanged
     {
         private AISuggestions _aiSuggestions;
+        private bool _modelIsReady;
 
         public MainViewModel()
         {
@@ -18,6 +19,16 @@ namespace Hello_World
             set
             {
                 _aiSuggestions = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ModelIsReady
+        {
+            get => _modelIsReady;
+            set
+            {
+                _modelIsReady = value;
                 OnPropertyChanged();
             }
         }

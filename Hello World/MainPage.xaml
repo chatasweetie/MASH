@@ -104,12 +104,12 @@
                 </Border>
                 <TextBox x:Name="Career1" Text="{Binding Career1, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox x:Name="Career2" Text="{Binding Career2, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox x:Name="Career3" Text="{Binding AISuggestions.Career3, Mode=OneWay} IsReadOnly="True" "/>
+                <TextBox x:Name="Career3" Text="{Binding AISuggestions.Career3, Mode=OneWay}"  IsReadOnly="True"/>
             </StackPanel>
         </Grid>
 
         <Grid Grid.Row="3" HorizontalAlignment="Center">
-            <Button x:Name="RollMagicNumberButton" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding CanRollMagicNumber}" Command="{Binding RollMagicNumberCommand}" Click="RollMagicNumberButton_Click"/>
+            <Button x:Name="RollMagicNumberButton" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding ModelIsReady}" Click="RollMagicNumberButton_Click"/>
         </Grid>
 
         <Grid Grid.Row="4" >

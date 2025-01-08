@@ -65,6 +65,7 @@ namespace Hello_World
             Debug.WriteLine("********************************");
             Debug.WriteLine("Model is ready");
             Debug.WriteLine("********************************");
+            _viewModel.ModelIsReady = true; // Set the property when the model is ready
         }
 
         private async void RollMagicNumberButton_Click(object sender, RoutedEventArgs e)
