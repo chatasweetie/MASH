@@ -14,9 +14,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ms-appx:///Resources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Storyboard x:Key="GatheringMagicStoryboard">
+                <ColorAnimationUsingKeyFrames Storyboard.TargetName="RollMagicNumberButton" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)">
+                    <DiscreteColorKeyFrame KeyTime="0:0:0" Value="#87ADFF"/>
+                    <DiscreteColorKeyFrame KeyTime="0:0:1" Value="#FFDF78"/>
+                    <DiscreteColorKeyFrame KeyTime="0:0:2" Value="#F980E5"/>
+                    <DiscreteColorKeyFrame KeyTime="0:0:3" Value="#47C569"/>
+                </ColorAnimationUsingKeyFrames>
+            </Storyboard>
         </ResourceDictionary>
     </Page.Resources>
-
 
     <Grid>
         <Grid.Background>
@@ -109,7 +116,10 @@
         </Grid>
 
         <Grid Grid.Row="3" HorizontalAlignment="Center">
-            <Button x:Name="RollMagicNumberButton" Content="Roll magic number" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsEnabled="{Binding ModelIsReady}" Click="RollMagicNumberButton_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="RollMagicNumberButton" Content="{Binding ButtonText}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="DarkGray" Margin="20" IsEnabled="{Binding ModelIsReady}" Click="RollMagicNumberButton_Click"/>
+                <Button x:Name="ClearButton" Content="Clear" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="DarkGray" Margin="20" Click="ClearButton_Click"/>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="4" >

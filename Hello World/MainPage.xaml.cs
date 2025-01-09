@@ -1,75 +1,60 @@
 using Hello_World.AIModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.ML.OnnxRuntime;
-using Microsoft.ML.OnnxRuntime.Tensors;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Hello_World.AIModel;
-using System.Threading.Tasks;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+
 
 namespace Hello_World
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
-
-        private TextBlock StatusTextBlock;
         private GenAIModel? _model;
         private MainViewModel _viewModel;
 
         public MainPage()
         {
             this.InitializeComponent();
-            StatusTextBlock = new TextBlock();
-            Debug.WriteLine("********************************");
-            Debug.WriteLine("Initializing MainWindow");
-            Debug.WriteLine("********************************");
             _viewModel = new MainViewModel();
             this.DataContext = _viewModel;
             InitializeModel();
         }
 
-        private async void InitializeModel()
+        private void InitializeModel()
         {
             Debug.WriteLine("********************************");
             Debug.WriteLine("Initializing Model");
             Debug.WriteLine("********************************");
-            GenAIModel.InitializeGenAI();
-            _model = await GenAIModel.CreateAsync(@"C:\Users\jearleycha\source\repos\MASH\Hello World\Models\cpu-int4-rtn-block-32-acc-level-4\");
-            Debug.WriteLine("********************************");
-            Debug.WriteLine("Model is ready");
-            Debug.WriteLine("********************************");
-            _viewModel.ModelIsReady = true; // Set the property when the model is ready
+
+            Task.Run(async () =>
+            {
+                GenAIModel.InitializeGenAI();
+                _model = await GenAIModel.CreateAsync(@"C:\Users\jearleycha\source\repos\MASH\Hello World\Models\cpu-int4-rtn-block-32-acc-level-4\");
+                Debug.WriteLine("********************************");
+                Debug.WriteLine("Model is ready");
+                Debug.WriteLine("********************************");
+
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    _viewModel.ModelIsReady = true;
+                    _viewModel.ButtonText = "Ready to receive your wishes";
+                    StartGatheringMagicAnimation();
+                });
+            });
         }
 
         private async void RollMagicNumberButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonText("Gathering magical forces to see your future");
+
             try
             {
                 int magicNumber = GenerateMagicNumber(2, 5);
@@ -77,35 +62,17 @@ namespace Hello_World
 
                 if (userInput != null)
                 {
-                    Debug.WriteLine($"Spouse1: {userInput.Spouse1}, Spouse2: {userInput.Spouse2}, Kids1: {userInput.Kids1}, Kids2: {userInput.Kids2}, Car1: {userInput.Car1}, Car2: {userInput.Car2}, Career1: {userInput.Career1}, Career2: {userInput.Career2}");
+                    LogUserInput(userInput);
 
-                    var aiSuggestions = await GetAISuggestions(userInput);
+                    var aiSuggestions = await GetAISuggestionsAsync(userInput);
                     _viewModel.AISuggestions = aiSuggestions;
-                    Debug.WriteLine(aiSuggestions.Spouse3);
-                    Debug.WriteLine(aiSuggestions.Car3);
-                    Debug.WriteLine(aiSuggestions.Kids3);
-                    Debug.WriteLine(aiSuggestions.Career3);
 
-                    var gameArray = new List<List<string>>
-                            {
-                                new List<string> { "Mansion", "Apartment", "Shack", "House" },
-                                new List<string> { userInput.Spouse1, userInput.Spouse2, aiSuggestions.Spouse3 },
-                                new List<string> { userInput.Kids1, userInput.Kids2, aiSuggestions.Kids3 },
-                                new List<string> { userInput.Car1, userInput.Car2, aiSuggestions.Car3 },
-                                new List<string> { userInput.Career1, userInput.Career2, aiSuggestions.Career3 }
-                            };
+                    LogAISuggestions(aiSuggestions);
 
-                    var result = ProcessGameArray(gameArray, magicNumber) as List<string>;
+                    var result = ProcessGameArray(CreateGameArray(userInput, aiSuggestions), magicNumber) as List<string>;
 
-                    ContentDialog dialog = new ContentDialog
-                    {
-                        Title = "Your True Fortune",
-                        Content = $"Behold! Your fortune has become clear. With the power of your magic number, I see your future. You'll have an amazing career in {result[4]}, you'll live in a/an {result[0]}, marry {result[1]}, have {result[2]} child(ren) with them and drive a {result[3]}.",
-                        CloseButtonText = "OK",
-                        XamlRoot = this.Content.XamlRoot
-                    };
-
-                    await dialog.ShowAsync();
+                    await ShowResultDialog(result);
+                    UpdateButtonText("Ready to retry if you didn't like your fortune");
                 }
                 else
                 {
@@ -116,6 +83,18 @@ namespace Hello_World
             {
                 Debug.WriteLine($"An error occurred: {ex.Message}");
             }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClearUserInput();
+        }
+
+        private void StartGatheringMagicAnimation()
+        {
+            _viewModel.ButtonText = "Ready to receive your wishes";
+            var storyboard = (Storyboard)Resources["GatheringMagicStoryboard"];
+            storyboard.Begin();
         }
 
         private int GenerateMagicNumber(int low, int high)
@@ -140,49 +119,37 @@ namespace Hello_World
             };
         }
 
-        private async Task<AISuggestions> GetAISuggestions(UserInput userInput)
+        private async Task<AISuggestions> GetAISuggestionsAsync(UserInput userInput)
         {
             Debug.WriteLine("Entering GetAISuggestions method");
 
-            string spouseInputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two people names and I want you to tell me a, only one, name and nothing else. You want you to only use very popular celebrity names. Let's begin now: {userInput.Spouse1} and {userInput.Spouse2}";
-            string carInputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two vehicle names or types of vehicle and I want you to tell me a, only one, vehicle name or type and nothing else. Ideally something that would be funny or odd for the first two. Let's begin now: {userInput.Car1} and {userInput.Car2}";
-            string careerInputText = $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two career or jobs and I want you to tell me a, only one, career or job and nothing else. Ideally something that would be funny or odd for the first two. Let's begin now: {userInput.Career1} and {userInput.Career2}";
-
-            string spouse = string.Empty;
-            string car = string.Empty;
-            string career = string.Empty;
-
-            if (_model != null && _model.IsReady)
-            {
-                Debug.WriteLine("DOING SPOUSE:");
-                string spouseResponse = await _model.ProcessPromptAsync(spouseInputText);
-                spouse = CleanAIResponseGetLastLineWithoutQuotes(spouseResponse);
-                Debug.WriteLine(spouse);
-                _viewModel.AISuggestions.Spouse3 = spouse;
-
-                Debug.WriteLine("DOING CAR:");
-                string carResponse = await _model.ProcessPromptAsync(carInputText);
-                car = CleanAIResponseGetLastLineWithoutQuotes(carResponse);
-                Debug.WriteLine(car);
-                _viewModel.AISuggestions.Car3 = car;
-
-                Debug.WriteLine("DOING CAREER:");
-                string careerResponse = await _model.ProcessPromptAsync(careerInputText);
-                career = CleanAIResponseGetLastLineWithoutQuotes(careerResponse);
-                Debug.WriteLine(career);
-                _viewModel.AISuggestions.Career3 = career;
-            }
-
             string kids3 = GenerateMagicNumber(0, 5).ToString();
-            _viewModel.AISuggestions.Kids3 = kids3;
+
+            var spouseTask = GetSuggestionAsync(CreateSpousePrompt(userInput));
+            var carTask = GetSuggestionAsync(CreateCarPrompt(userInput));
+            var careerTask = GetSuggestionAsync(CreateCareerPrompt(userInput));
+
+            await Task.WhenAll(spouseTask, carTask, careerTask);
 
             return new AISuggestions
             {
-                Spouse3 = spouse,
+                Spouse3 = await spouseTask,
                 Kids3 = kids3,
-                Car3 = car,
-                Career3 = career
+                Car3 = await carTask,
+                Career3 = await careerTask
             };
+        }
+
+        private async Task<string> GetSuggestionAsync(string inputText)
+        {
+            if (_model != null && _model.IsReady)
+            {
+                Debug.WriteLine(inputText);
+                string response = await _model.ProcessPromptAsync(inputText);
+                return CleanAIResponseGetLastLineWithoutQuotes(response);
+            }
+
+            return string.Empty;
         }
 
         private object ProcessGameArray(List<List<string>> gameArray, int magicNumber)
@@ -226,10 +193,83 @@ namespace Hello_World
             return lastLine;
         }
 
-        // Validates that the input contains only numbers
         private void ValidateNumberInput(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
         {
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
+        }
+
+        private void UpdateButtonText(string text)
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                _viewModel.ButtonText = text;
+            });
+        }
+
+        private void LogUserInput(UserInput userInput)
+        {
+            Debug.WriteLine($"Spouse1: {userInput.Spouse1}, Spouse2: {userInput.Spouse2}, Kids1: {userInput.Kids1}, Kids2: {userInput.Kids2}, Car1: {userInput.Car1}, Car2: {userInput.Car2}, Career1: {userInput.Career1}, Career2: {userInput.Career2}");
+        }
+
+        private void LogAISuggestions(AISuggestions aiSuggestions)
+        {
+            Debug.WriteLine(aiSuggestions.Spouse3);
+            Debug.WriteLine(aiSuggestions.Car3);
+            Debug.WriteLine(aiSuggestions.Kids3);
+            Debug.WriteLine(aiSuggestions.Career3);
+        }
+
+        private List<List<string>> CreateGameArray(UserInput userInput, AISuggestions aiSuggestions)
+        {
+            return new List<List<string>>
+                {
+                    new List<string> { "Mansion", "Apartment", "Shack", "House" },
+                    new List<string> { userInput.Spouse1, userInput.Spouse2, aiSuggestions.Spouse3 },
+                    new List<string> { userInput.Kids1, userInput.Kids2, aiSuggestions.Kids3 },
+                    new List<string> { userInput.Car1, userInput.Car2, aiSuggestions.Car3 },
+                    new List<string> { userInput.Career1, userInput.Career2, aiSuggestions.Career3 }
+                };
+        }
+
+        private async Task ShowResultDialog(List<string> result)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Your True Fortune",
+                Content = $"Behold! Your fortune has become clear. With the power of your magic number, I see your future. You'll have an amazing career in {result[4]}, you'll live in a/an {result[0]}, marry {result[1]}, have {result[2]} child(ren) with them and drive a {result[3]}.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private void ClearUserInput()
+        {
+            _viewModel.Spouse1 = string.Empty;
+            _viewModel.Spouse2 = string.Empty;
+            _viewModel.Kids1 = string.Empty;
+            _viewModel.Kids2 = string.Empty;
+            _viewModel.Car1 = string.Empty;
+            _viewModel.Car2 = string.Empty;
+            _viewModel.Career1 = string.Empty;
+            _viewModel.Career2 = string.Empty;
+            _viewModel.AISuggestions = new AISuggestions();
+        }
+
+        private string CreateSpousePrompt(UserInput userInput)
+        {
+            return $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two people names and I want you to tell me a, only one, name and nothing else. You want you to only use very popular celebrity names. Let's begin now: {userInput.Spouse1} and {userInput.Spouse2}";
+        }
+
+        private string CreateCarPrompt(UserInput userInput)
+        {
+            return $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two vehicle names or types of vehicle and I want you to tell me a, only one, vehicle name or type and nothing else. Ideally something that would be funny or odd for the first two. Let's begin now: {userInput.Car1} and {userInput.Car2}";
+        }
+
+        private string CreateCareerPrompt(UserInput userInput)
+        {
+            return $"We are going to play a game, a very silly game. The one rule is that you can only provide a single response that is 3 words or less. I'll give you two career or jobs and I want you to tell me a, only one, career or job and nothing else. Ideally something that would be funny or odd for the first two. Let's begin now: {userInput.Career1} and {userInput.Career2}";
         }
     }
 
