@@ -36,8 +36,7 @@ namespace Hello_World
 
             Task.Run(async () =>
             {
-                GenAIModel.InitializeGenAI();
-                _model = await GenAIModel.CreateAsync(@"C:\Users\jearleycha\source\repos\MASH\Hello World\Models\cpu-int4-rtn-block-32-acc-level-4\");
+                _model = await GenAIModel.CreateModel();
                 Debug.WriteLine("********************************");
                 Debug.WriteLine("Model is ready");
                 Debug.WriteLine("********************************");
@@ -64,7 +63,7 @@ namespace Hello_World
                 {
                     LogUserInput(userInput);
 
-                    var aiSuggestions = await GetAISuggestionsAsync(userInput);
+                    var aiSuggestions = await GetAISuggestions(userInput);
                     _viewModel.AISuggestions = aiSuggestions;
 
                     LogAISuggestions(aiSuggestions);
@@ -119,15 +118,15 @@ namespace Hello_World
             };
         }
 
-        private async Task<AISuggestions> GetAISuggestionsAsync(UserInput userInput)
+        private async Task<AISuggestions> GetAISuggestions(UserInput userInput)
         {
             Debug.WriteLine("Entering GetAISuggestions method");
 
             string kids3 = GenerateMagicNumber(0, 5).ToString();
 
-            var spouseTask = GetSuggestionAsync(CreateSpousePrompt(userInput));
-            var carTask = GetSuggestionAsync(CreateCarPrompt(userInput));
-            var careerTask = GetSuggestionAsync(CreateCareerPrompt(userInput));
+            var spouseTask = GetSuggestion(CreateSpousePrompt(userInput));
+            var carTask = GetSuggestion(CreateCarPrompt(userInput));
+            var careerTask = GetSuggestion(CreateCareerPrompt(userInput));
 
             await Task.WhenAll(spouseTask, carTask, careerTask);
 
@@ -140,12 +139,12 @@ namespace Hello_World
             };
         }
 
-        private async Task<string> GetSuggestionAsync(string inputText)
+        private async Task<string> GetSuggestion(string inputText)
         {
             if (_model != null && _model.IsReady)
             {
                 Debug.WriteLine(inputText);
-                string response = await _model.ProcessPromptAsync(inputText);
+                string response = await _model.ProcessPrompt(inputText);
                 return CleanAIResponseGetLastLineWithoutQuotes(response);
             }
 

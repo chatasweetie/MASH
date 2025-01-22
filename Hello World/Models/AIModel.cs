@@ -10,23 +10,27 @@ namespace Hello_World.AIModel
     internal class GenAIModel : IDisposable
     {
         private const int DefaultMaxLength = 1024;
+        private static readonly string ModelDirectory = @"C:\Users\jearleycha\source\repos\MASH\Hello World\Models\cpu-int4-rtn-block-32-acc-level-4\";
         private Model? _model;
         private Tokenizer? _tokenizer;
         private static readonly SemaphoreSlim _createSemaphore = new(1, 1);
         private static OgaHandle? _ogaHandle;
 
-        private GenAIModel(string modelDir)
+        private GenAIModel()
         {
-            // Constructor logic if needed
+            Debug.WriteLine("********************************");
+            Debug.WriteLine("Initializing GenAI");
+            Debug.WriteLine("********************************");
+            _ogaHandle = new OgaHandle();
         }
 
-        public static async Task<GenAIModel?> CreateAsync(string modelDir, CancellationToken cancellationToken = default)
+        public static async Task<GenAIModel?> CreateModel(CancellationToken cancellationToken = default)
         {
             Debug.WriteLine("********************************");
-            Debug.WriteLine("In CreateAsync");
+            Debug.WriteLine("In CreateModel");
             Debug.WriteLine("********************************");
 
-            var model = new GenAIModel(modelDir);
+            var model = new GenAIModel();
             var lockAcquired = false;
 
             try
@@ -34,11 +38,11 @@ namespace Hello_World.AIModel
                 await _createSemaphore.WaitAsync(cancellationToken);
                 lockAcquired = true;
                 cancellationToken.ThrowIfCancellationRequested();
-                await model.InitializeAsync(modelDir, cancellationToken);
+                await model.InitializeModel(ModelDirectory, cancellationToken);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception in CreateAsync: {ex.Message}");
+                Debug.WriteLine($"Exception in CreateModel: {ex.Message}");
                 model?.Dispose();
                 return null;
             }
@@ -53,14 +57,6 @@ namespace Hello_World.AIModel
             return model;
         }
 
-        public static void InitializeGenAI()
-        {
-            Debug.WriteLine("********************************");
-            Debug.WriteLine("Initializing GenAI");
-            Debug.WriteLine("********************************");
-            _ogaHandle = new OgaHandle();
-        }
-
         public bool IsReady => _model != null && _tokenizer != null;
 
         public void Dispose()
@@ -70,7 +66,7 @@ namespace Hello_World.AIModel
             _ogaHandle?.Dispose();
         }
 
-        public async Task<string> ProcessPromptAsync(string prompt, CancellationToken ct = default)
+        public async Task<string> ProcessPrompt(string prompt, CancellationToken ct = default)
         {
             if (!IsReady)
             {
@@ -112,7 +108,7 @@ namespace Hello_World.AIModel
             return stringBuilder.ToString();
         }
 
-        private Task InitializeAsync(string modelDir, CancellationToken cancellationToken = default)
+        private Task InitializeModel(string modelDir, CancellationToken cancellationToken = default)
         {
             return Task.Run(
                 () =>

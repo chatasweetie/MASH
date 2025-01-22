@@ -35,7 +35,6 @@ namespace Hello_World
                 _kids3 = value;
                 Debug.WriteLine("Kids3: " + _kids3);
                 OnPropertyChanged();
-
             }
         }
 
